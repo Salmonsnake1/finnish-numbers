@@ -253,6 +253,12 @@ async function loadCases() {
     cases = await response.json();
     const responseOrdinal = await fetch('./ordinals.json');
     ordinalCases = await responseOrdinal.json();
+    const pluralResponse = await fetch('./pluralcases.json');
+    pluralCases = await pluralResponse.json();
+    console.log(pluralCases);
+    const pluralOrdinalResponse = await fetch('./pluralordinals.json');
+    pluralOrdinalCases = await pluralOrdinalResponse.json();
+    console.log(pluralOrdinalCases);
   } catch (error) {
     console.error("Error loading cases:", error);
     document.getElementById("countBox").textContent = "Error loading cases, please try to reload";
