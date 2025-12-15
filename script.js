@@ -366,7 +366,8 @@ function getHundreds(number) {
     } else {
       if (tens === 1 && ones > 0) {
         numParts.push(numType[ones][caseChoice] + "toista");
-        return numParts.join("&shy;");
+        displayWordAnswer = numParts.join("&shy;");
+        return numParts.join("");
       } else if (tens > 1) {
       numParts.push(numType[tens][caseChoice] + numType[10][tenshunsCase]);
       }
