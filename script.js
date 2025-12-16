@@ -20,6 +20,7 @@ let cases = {}; // holds case data from JSON
 let ordinalCases = {}; // holds ordinalcase data from JSON
 let numView = true; // number is shown when true, word when false
 let ordinalView = false; // sets so basic numbers first
+let pluralView = false; // sets so singular first
 let ekatokaAnswer = ""; // sets for the ensimmäinen, toinen, yhdes, kahdes switch
 let displayWordAnswer = ""; // for displaying the answer to the user
 
@@ -56,6 +57,18 @@ ordButton.addEventListener("click", function(event) {
     document.getElementById("ordButton").textContent = "Switch to Basic"
   }
 }) 
+
+// switching from singular to plural
+pluralButton.addEventListener("click", function(event) {
+  pluralView = !pluralView;
+  genRanNum();
+  if (!pluralView) {
+    document.getElementById("pluralButton").textContent = "Switch to Plural"
+  } else {
+    document.getElementById("pluralButton").textContent = "Switch to Singular"
+  }
+}) 
+
 // for user input
 ansButton.addEventListener("click", function(event) {
   event.preventDefault();
@@ -234,6 +247,7 @@ async function startProg() {
   caseChoice = "nominative";
   numView = true;
   ordinalView = false;
+  pluralView = false;
   document.getElementById("ordButton").textContent = "Switch to Ordinals";
   document.getElementById("switchButton").textContent = "Switch to Text";
   count = 0;
@@ -499,7 +513,7 @@ function switchRan() {
 
 // Ensures "connecting" numbers like ten, hundred, thousand are in partitive when the overall case is nominative, otherwise matching case.
 function joinNumCaseSwitch() {
-    if(!ordinalView) { 
+    if(!ordinalView && !pluralView) { 
       return (caseChoice === "nominative") ? "partitive" : caseChoice;
     }
     return caseChoice; 
@@ -508,5 +522,9 @@ function joinNumCaseSwitch() {
 // for switching between ordinals
 
 function getNumType() {
-  return ordinalView ? ordinalCases : cases;
+  if (pluralView) {
+    return ordinalView ? pluralOrdinalCases : pluralCases;
+  } else {
+    return ordinalView ? ordinalCases : cases;
+  }
 }
