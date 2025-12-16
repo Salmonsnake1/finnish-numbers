@@ -24,6 +24,13 @@ let pluralView = false; // sets so singular first
 let ekatokaAnswer = ""; // sets for the ensimmäinen, toinen, yhdes, kahdes switch
 let displayWordAnswer = ""; // for displaying the answer to the user
 
+const topButton = document.getElementById('ordButton');
+const underButton = document.getElementById('pluralButton');
+
+const buttonWidth = topButton.offsetWidth / 2;
+underButton.style.marginLeft = `${buttonWidth}px`;
+underButton.style.marginRight = `${buttonWidth}px`;
+
 // Event listeners
 
 // Updates checkboxes when "Select All" changes

@@ -61,6 +61,11 @@ main {
   flex-wrap: wrap;
 }
 
+#pluralButton {
+  margin-left: 70px;
+  margin-right: 70px;
+}
+
 .button-group button,
 #ansButton,
 #genButton {
