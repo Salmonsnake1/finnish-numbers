@@ -477,18 +477,22 @@ function checkAnswer() {
 
   if (correctAns) {
     count++;
-    document.getElementById("countBox").textContent = "Current Streak: " + count;
+    if (ekatokaAnswer === "") {
+    document.getElementById("countBox").innerHTML = "Correct! '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
+    wordAnswer + "</span>' <br>Current Streak: " + count; 
+    } else {
+      document.getElementById("countBox").innerHTML = "Correct! '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
+      wordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: " + count; 
+    }
     document.getElementById("input").value = "";
     return;
   } else {
     if (ekatokaAnswer === "") {
-    document.getElementById("countBox").innerHTML =
-    "That was incorrect, you wrote '<span class='red-word'>" + answer + "</span>'.<br>" +
-    "The correct answer was '<span class='red-word'>" + shownAns + "</span>'.";
+      document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
+      wordAnswer + "</span>' <br>Current Streak: 0"; 
     } else {
-      document.getElementById("countBox").innerHTML =
-    "That was incorrect, you wrote '<span class='red-word'>" + answer + "</span>'.<br>" +
-    "The correct answer was '<span class='red-word'>" + shownAns + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>'.";
+      document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
+      wordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: 0";  
     }
   }
 
