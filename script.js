@@ -322,7 +322,8 @@ function genRanNum() {
     if (numView) {
       document.getElementById("numBox").textContent = ranNum; 
     } else {
-      document.getElementById("numBox").innerHTML = displayWordAnswer; 
+      // document.getElementById("numBox").innerHTML = displayWordAnswer; 
+      document.getElementById("numBox").innerHTML = wordAnswer;
       
     }
     document.getElementById("input").focus();
@@ -413,7 +414,7 @@ function getHundreds(number) {
     }
   }
   displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("");
+  return numParts.join("&shy;");
   
 }
 
@@ -438,7 +439,7 @@ function getThousands(number) {
   }
 
   displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("");
+  return numParts.join("&shy;");
 }
 
 // Checks user answer against correct answer so either number in digit or word form
@@ -508,13 +509,14 @@ function checkAnswer() {
 
 // Switches between number and text display
 function switchRan() {
-  genRanNum();
+  // genRanNum();
   
   document.getElementById("input").value = "";
 
   numView = !numView;
 
-  document.getElementById("numBox").innerHTML = numView ? ranNum : displayWordAnswer;
+  // document.getElementById("numBox").innerHTML = numView ? ranNum : displayWordAnswer;
+  document.getElementById("numBox").innerHTML = numView ? ranNum : wordAnswer;
   content = document.getElementById("numBox").textContent;
 
   

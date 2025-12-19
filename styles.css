@@ -125,6 +125,8 @@ form {
 #streakBox {
   text-align: center;
   font-weight: bold;
+  hyphens: manual;
+  overflow-wrap: anywhere;
 }
 
 details ul {
