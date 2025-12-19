@@ -509,8 +509,7 @@ function checkAnswer() {
 
 // Switches between number and text display
 function switchRan() {
-  // genRanNum();
-  
+  genRanNum();
   document.getElementById("input").value = "";
 
   numView = !numView;
