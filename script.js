@@ -6,6 +6,7 @@ const customRangeInputs = document.getElementById('customRangeInputs');
 const input = document.getElementById("input");
 const selectAllBox = document.getElementById("selectAllCases");
 const caseCheckboxes = document.querySelectorAll('input[name="cases"]');
+const shortCheckBox = document.getElementById("shortAnswers");
 
 
 let max = 100; // initial max range 
@@ -18,9 +19,16 @@ let count = 0; // current streak
 let streak = 0; // highest streak
 let cases = {}; // holds case data from JSON
 let ordinalCases = {}; // holds ordinalcase data from JSON
+let pluralCases = {};
+let pluralOrdinalCases = {};
+let shortenCases = {};
+let shortenOrdinals = {};
+let shortenPluralCases = {};
+let shortenPluralOrdinals = {};
 let numView = true; // number is shown when true, word when false
 let ordinalView = false; // sets so basic numbers first
 let pluralView = false; // sets so singular first
+let shortView = false;
 let ekatokaAnswer = ""; // sets for the ensimmäinen, toinen, yhdes, kahdes switch
 let displayWordAnswer = ""; // for displaying the answer to the user
 
@@ -75,6 +83,18 @@ pluralButton.addEventListener("click", function(event) {
     document.getElementById("pluralButton").textContent = "Switch to Singular"
   }
 }) 
+
+// for making it so have to use number shortenings
+shortAnswers.addEventListener("click", function(event) {
+  genRanNum();
+  if (shortAnswers.checked) {
+    shortView = true;
+    console.log(shortView);
+  } else {
+    shortView = false;
+    console.log(shortView);
+  }
+})
 
 // for user input
 ansButton.addEventListener("click", function(event) {
@@ -262,6 +282,7 @@ async function startProg() {
   document.getElementById("input").value = "";
   document.getElementById("input").style.height = "auto";
   document.getElementById("input").rows = 1;
+  shortCheckBox.checked = false;
 
   await loadCases();     
   genRanNum();                
@@ -276,10 +297,13 @@ async function loadCases() {
     ordinalCases = await responseOrdinal.json();
     const pluralResponse = await fetch('./pluralcases.json');
     pluralCases = await pluralResponse.json();
-    console.log(pluralCases);
     const pluralOrdinalResponse = await fetch('./pluralordinals.json');
     pluralOrdinalCases = await pluralOrdinalResponse.json();
-    console.log(pluralOrdinalCases);
+    const shortenCasesResponse = await fetch('./shortencases.json');
+    shortenCases = await shortenCasesResponse.json();
+    const shortenOrdinalsResponse = await fetch('./shortenordinals.json');
+    shortenOrdinals = await shortenOrdinalsResponse.json();
+    const shortPluralCasesResponse = await fetch ('./shortenpluralcases.json');
   } catch (error) {
     console.error("Error loading cases:", error);
     document.getElementById("countBox").textContent = "Error loading cases, please try to reload";
@@ -327,7 +351,6 @@ function genRanNum() {
       
     }
     document.getElementById("input").focus();
-    
 }
 
 // Converts number into word form
@@ -397,7 +420,7 @@ function getHundreds(number) {
         displayWordAnswer = numParts.join("&shy;");
         return numParts.join("");
       } else if (tens > 1) {
-      numParts.push(numType[tens][caseChoice] + numType[10][tenshunsCase]);
+        numParts.push(numType[tens][caseChoice] + numType[10][tenshunsCase]);
       }
 
       if (ones > 0) {
@@ -538,5 +561,15 @@ function getNumType() {
     return ordinalView ? pluralOrdinalCases : pluralCases;
   } else {
     return ordinalView ? ordinalCases : cases;
+  }
+}
+
+// for switching that the number and relevant answer needs the correct shortening ending :
+
+function shortCaseType() {
+  if (pluralView) {
+    return ordinalView ? shortenPluralOrdinals : shortenPluralCases; 
+  } else {
+    return ordinalView ? shortenOrdinals : shortenCases;
   }
 }
