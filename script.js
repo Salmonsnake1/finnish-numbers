@@ -28,9 +28,11 @@ let shortenPluralOrdinals = {};
 let numView = true; // number is shown when true, word when false
 let ordinalView = false; // sets so basic numbers first
 let pluralView = false; // sets so singular first
-let shortView = false;
 let ekatokaAnswer = ""; // sets for the ensimmäinen, toinen, yhdes, kahdes switch
 let displayWordAnswer = ""; // for displaying the answer to the user
+let altNum = ""; // when ordinals have :s ending
+let shortDisplayNum = "";
+let ranNumCase = 0;
 
 const topButton = document.getElementById('ordButton');
 const underButton = document.getElementById('pluralButton');
@@ -87,13 +89,6 @@ pluralButton.addEventListener("click", function(event) {
 // for making it so have to use number shortenings
 shortAnswers.addEventListener("click", function(event) {
   genRanNum();
-  if (shortAnswers.checked) {
-    shortView = true;
-    console.log(shortView);
-  } else {
-    shortView = false;
-    console.log(shortView);
-  }
 })
 
 // for user input
@@ -270,6 +265,7 @@ async function startProg() {
   document.querySelectorAll('input[name="cases"]').forEach((box) => {
     box.checked = (box.id === "case1");
   });
+  document.getElementById("selectAllCases").checked = false;
   checkedCases = ["nominative"];
   caseChoice = "nominative";
   numView = true;
@@ -301,9 +297,16 @@ async function loadCases() {
     pluralOrdinalCases = await pluralOrdinalResponse.json();
     const shortenCasesResponse = await fetch('./shortencases.json');
     shortenCases = await shortenCasesResponse.json();
+    console.log(shortenCases);
     const shortenOrdinalsResponse = await fetch('./shortenordinals.json');
     shortenOrdinals = await shortenOrdinalsResponse.json();
-    const shortPluralCasesResponse = await fetch ('./shortenpluralcases.json');
+    console.log(shortenOrdinals);
+    const shortenPluralCasesResponse = await fetch ('./shortenpluralcases.json');
+    shortenPluralCases = await shortenPluralCasesResponse.json();
+    console.log(shortenPluralCases);
+    const shortenPluralOrdinalsResponse = await fetch ('./shortenpluralordinals.json');
+    shortenPluralOrdinals = await shortenPluralOrdinalsResponse.json();
+    console.log(shortenPluralOrdinals);
   } catch (error) {
     console.error("Error loading cases:", error);
     document.getElementById("countBox").textContent = "Error loading cases, please try to reload";
@@ -342,15 +345,58 @@ function genRanNum() {
     ranNum = Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); 
 
     defineAnswer();
+
+    ranNumCase = ranNum;
+    shortDisplayNum = ranNum.toString();
+
+    if (shortCheckBox.checked) {
+      // run code here to create correct number and answer
+      console.log(ranNum)
+      shortDisplayNum = addNumberEnding(shortDisplayNum, ranNumCase);
+    }
     
     if (numView) {
-      document.getElementById("numBox").textContent = ranNum; 
+      document.getElementById("numBox").textContent = shortDisplayNum; 
     } else {
-      // document.getElementById("numBox").innerHTML = displayWordAnswer; 
-      document.getElementById("numBox").innerHTML = wordAnswer;
+      document.getElementById("numBox").innerHTML = displayWordAnswer; 
+      // document.getElementById("numBox").innerHTML = wordAnswer;
       
     }
     document.getElementById("input").focus();
+}
+
+// adds ending for number form
+function addNumberEnding(displayNum, numIdent) {
+  const jsonType = shortCaseType();
+  ones = numIdent % 10;
+  tens = Math.floor((numIdent % 100) / 10);
+  hundreds = Math.floor((numIdent % 100) / 100);
+  thousands = Math.floor((numIdent % 100) / 1000);
+
+
+  if (caseChoice !== "nominative") {
+
+    if (ones > 0) {
+      displayNum = displayNum + jsonType[ones][caseChoice];
+    } else if (tens > 0 && ones === 0) {
+      displayNum = displayNum + jsonType[10][caseChoice];
+    } else if (hundreds > 0 && tens === 0 && ones === 0) {
+      displayNum = displayNum + jsonType[100][caseChoice];
+    } else if (thousands > 0 && hundreds === 0 && tens === 0 && ones === 0) {
+      displayNum = displayNum + jsonType[1000][caseChoice];
+    } else if (displayNum === 1000000) {
+      displayNum = displayNum + jsonType[1000000][caseChoice];
+    }
+  }
+
+  if (caseChoice === "nominative" && ordinalView) {
+    altNum = displayNum + ":s";
+    displayNum = displayNum + ".";
+  }
+  console.log(jsonType);
+  console.log(displayNum);
+
+  return displayNum;
 }
 
 // Converts number into word form
@@ -437,7 +483,7 @@ function getHundreds(number) {
     }
   }
   displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("&shy;");
+  return numParts.join("");
   
 }
 
@@ -462,7 +508,7 @@ function getThousands(number) {
   }
 
   displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("&shy;");
+  return numParts.join("");
 }
 
 // Checks user answer against correct answer so either number in digit or word form
