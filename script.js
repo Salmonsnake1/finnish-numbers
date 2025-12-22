@@ -346,6 +346,9 @@ function genRanNum() {
 
     defineAnswer();
 
+    console.log(displayWordAnswer);
+    console.log(wordAnswer);
+
     ranNumCase = ranNum;
     shortDisplayNum = ranNum.toString();
 
@@ -421,17 +424,23 @@ function defineAnswer() {
   const numType = getNumType();
 
   if (ranNum >= 1000000) {
-    wordAnswer = numType[ranNum][caseChoice] 
+    wordAnswer = numType[ranNum][caseChoice]
+    displayWordAnswer = wordAnswer;
     return;
   }
 
   if (ranNum >= 1000) {
-    wordAnswer = getThousands(ranNum);
+    parts = getThousands(ranNum);
+    console.log(parts);
+    displayWordAnswer = parts.join("&shy;");
+    wordAnswer = parts.join("");
     return;
   }
 
   if (ranNum >= 0) {
-    wordAnswer = getHundreds(ranNum);
+    parts = getHundreds(ranNum);
+    displayWordAnswer = parts.join("&shy;");
+    wordAnswer = parts.join("");
     return;
   }
 }
@@ -455,7 +464,8 @@ function getHundreds(number) {
     if (hundreds === 1) {
       numParts.push(numType[100][caseChoice]);
     } else if (hundreds > 1) {
-      numParts.push(numType[hundreds][caseChoice] + numType[100][tenshunsCase]);
+      numParts.push(numType[hundreds][caseChoice]);
+      numParts.push(numType[100][tenshunsCase]);
     }
   
     if (tens === 1 && ones === 0) {
@@ -463,10 +473,10 @@ function getHundreds(number) {
     } else {
       if (tens === 1 && ones > 0) {
         numParts.push(numType[ones][caseChoice] + "toista");
-        displayWordAnswer = numParts.join("&shy;");
-        return numParts.join("");
+        return numParts;
       } else if (tens > 1) {
-        numParts.push(numType[tens][caseChoice] + numType[10][tenshunsCase]);
+        numParts.push(numType[tens][caseChoice]);
+        numParts.push(numType[10][tenshunsCase]);
       }
 
       if (ones > 0) {
@@ -482,8 +492,7 @@ function getHundreds(number) {
       } 
     }
   }
-  displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("");
+  return numParts;
   
 }
 
@@ -500,15 +509,16 @@ function getThousands(number) {
   if (thousands === 1) {
     numParts.push(numType[1000][caseChoice]);
   } else {
-    numParts.push(getHundreds(thousands) + numType[1000][thousCase]);
+    numParts.push(...getHundreds(thousands));
+    numParts.push(numType[1000][thousCase]);
   }
 
   if (hundreds > 0) {
-    numParts.push(getHundreds(hundreds));
+    numParts.push(...getHundreds(hundreds));
   }
 
-  displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("");
+  
+  return numParts;
 }
 
 // Checks user answer against correct answer so either number in digit or word form
