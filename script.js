@@ -6,6 +6,7 @@ const customRangeInputs = document.getElementById('customRangeInputs');
 const input = document.getElementById("input");
 const selectAllBox = document.getElementById("selectAllCases");
 const caseCheckboxes = document.querySelectorAll('input[name="cases"]');
+const shortCheckBox = document.getElementById("shortAnswers");
 
 
 let max = 100; // initial max range 
@@ -18,11 +19,21 @@ let count = 0; // current streak
 let streak = 0; // highest streak
 let cases = {}; // holds case data from JSON
 let ordinalCases = {}; // holds ordinalcase data from JSON
+let pluralCases = {};
+let pluralOrdinalCases = {};
+let shortenCases = {};
+let shortenOrdinals = {};
+let shortenPluralCases = {};
+let shortenPluralOrdinals = {};
 let numView = true; // number is shown when true, word when false
 let ordinalView = false; // sets so basic numbers first
 let pluralView = false; // sets so singular first
 let ekatokaAnswer = ""; // sets for the ensimmäinen, toinen, yhdes, kahdes switch
 let displayWordAnswer = ""; // for displaying the answer to the user
+let altNum = ""; // when ordinals have :s ending
+let shortDisplayNum = "";
+let ranNumCase = 0;
+let ekatokaNum = "test";
 
 const topButton = document.getElementById('ordButton');
 const underButton = document.getElementById('pluralButton');
@@ -76,6 +87,11 @@ pluralButton.addEventListener("click", function(event) {
   }
 }) 
 
+// for making it so have to use number shortenings
+shortAnswers.addEventListener("click", function(event) {
+  genRanNum();
+})
+
 // for user input
 ansButton.addEventListener("click", function(event) {
   event.preventDefault();
@@ -97,7 +113,7 @@ ansButton.addEventListener("click", function(event) {
     }
     // checks answer correctness and generates a new number
     checkAnswer();
-    genRanNum();
+   // genRanNum();
 }) 
 // for user input
 input.addEventListener("keydown", function(event) {
@@ -250,6 +266,7 @@ async function startProg() {
   document.querySelectorAll('input[name="cases"]').forEach((box) => {
     box.checked = (box.id === "case1");
   });
+  document.getElementById("selectAllCases").checked = false;
   checkedCases = ["nominative"];
   caseChoice = "nominative";
   numView = true;
@@ -262,6 +279,7 @@ async function startProg() {
   document.getElementById("input").value = "";
   document.getElementById("input").style.height = "auto";
   document.getElementById("input").rows = 1;
+  shortCheckBox.checked = false;
 
   await loadCases();     
   genRanNum();                
@@ -276,10 +294,20 @@ async function loadCases() {
     ordinalCases = await responseOrdinal.json();
     const pluralResponse = await fetch('./pluralcases.json');
     pluralCases = await pluralResponse.json();
-    console.log(pluralCases);
     const pluralOrdinalResponse = await fetch('./pluralordinals.json');
     pluralOrdinalCases = await pluralOrdinalResponse.json();
-    console.log(pluralOrdinalCases);
+    const shortenCasesResponse = await fetch('./shortencases.json');
+    shortenCases = await shortenCasesResponse.json();
+    console.log(shortenCases);
+    const shortenOrdinalsResponse = await fetch('./shortenordinals.json');
+    shortenOrdinals = await shortenOrdinalsResponse.json();
+    console.log(shortenOrdinals);
+    const shortenPluralCasesResponse = await fetch ('./shortenpluralcases.json');
+    shortenPluralCases = await shortenPluralCasesResponse.json();
+    console.log(shortenPluralCases);
+    const shortenPluralOrdinalsResponse = await fetch ('./shortenpluralordinals.json');
+    shortenPluralOrdinals = await shortenPluralOrdinalsResponse.json();
+    console.log(shortenPluralOrdinals);
   } catch (error) {
     console.error("Error loading cases:", error);
     document.getElementById("countBox").textContent = "Error loading cases, please try to reload";
@@ -318,16 +346,77 @@ function genRanNum() {
     ranNum = Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); 
 
     defineAnswer();
+
+    console.log(displayWordAnswer);
+    console.log(wordAnswer);
+
+    ranNumCase = ranNum;
+    shortDisplayNum = ranNum.toString();
+
+    if (shortCheckBox.checked) {
+      shortDisplayNum = addNumberEnding(shortDisplayNum, ranNumCase);
+    }
     
     if (numView) {
-      document.getElementById("numBox").textContent = ranNum; 
+      document.getElementById("numBox").innerHTML = shortDisplayNum; 
     } else {
       document.getElementById("numBox").innerHTML = displayWordAnswer; 
       // document.getElementById("numBox").innerHTML = wordAnswer;
       
     }
     document.getElementById("input").focus();
-    
+}
+
+// adds ending for number form
+function addNumberEnding(displayNum, numIdent) {
+  const jsonType = shortCaseType();
+  ones = numIdent % 10;
+  tens = Math.floor((numIdent % 100) / 10);
+  hundreds = Math.floor((numIdent % 1000) / 100);
+  thousands = Math.floor((numIdent % 10000) / 1000);
+  const tenThousands = Math.floor((numIdent % 100000) / 10000);
+  const hundredThousands = Math.floor((numIdent % 1000000) / 100000);
+
+  if (ones > 0) {
+    if (ordinalView && (ones === 1 || ones === 2)) {
+          let onesChoice = "";
+          (ones === 1) ? onesChoice = "eka" : ones;
+          (ones === 2) ? onesChoice = "toka" : ones;
+          ekatokaNum = displayNum + jsonType[onesChoice][caseChoice]
+        }
+  }
+
+  if (caseChoice !== "nominative") {
+    if (numIdent === 0) {
+      displayNum = displayNum + jsonType[0][caseChoice];
+    } else if (ones > 0) {
+      displayNum = displayNum + jsonType[ones][caseChoice];
+    } else if (tens > 0 && ones === 0) {
+      displayNum = displayNum + jsonType[10][caseChoice];
+    } else if (hundreds > 0 && tens === 0 && ones === 0) {
+      displayNum = displayNum + jsonType[100][caseChoice];
+    } else if (thousands > 0 && hundreds === 0 && tens === 0 && ones === 0) {
+      displayNum = displayNum + jsonType[1000][caseChoice];
+    } else if (tenThousands > 0) {
+      displayNum = displayNum + jsonType[1000][caseChoice];
+    } else if (hundredThousands > 0) {
+      displayNum = displayNum + jsonType[1000][caseChoice];
+    } else if (numIdent === 1000000) {
+      displayNum = displayNum + jsonType[1000000][caseChoice];
+    }
+  }
+
+  console.log(ekatokaNum)
+
+  if (caseChoice === "nominative" && ordinalView) {
+    altNum = displayNum + ":s";
+    displayNum = displayNum + ".";
+  }
+  console.log(altNum);
+  console.log(jsonType);
+  console.log(displayNum);
+
+  return displayNum;
 }
 
 // Converts number into word form
@@ -352,17 +441,23 @@ function defineAnswer() {
   const numType = getNumType();
 
   if (ranNum >= 1000000) {
-    wordAnswer = numType[ranNum][caseChoice] 
+    wordAnswer = numType[ranNum][caseChoice]
+    displayWordAnswer = wordAnswer;
     return;
   }
 
   if (ranNum >= 1000) {
-    wordAnswer = getThousands(ranNum);
+    parts = getThousands(ranNum);
+    console.log(parts);
+    displayWordAnswer = parts.join("&shy;");
+    wordAnswer = parts.join("");
     return;
   }
 
   if (ranNum >= 0) {
-    wordAnswer = getHundreds(ranNum);
+    parts = getHundreds(ranNum);
+    displayWordAnswer = parts.join("&shy;");
+    wordAnswer = parts.join("");
     return;
   }
 }
@@ -386,7 +481,8 @@ function getHundreds(number) {
     if (hundreds === 1) {
       numParts.push(numType[100][caseChoice]);
     } else if (hundreds > 1) {
-      numParts.push(numType[hundreds][caseChoice] + numType[100][tenshunsCase]);
+      numParts.push(numType[hundreds][caseChoice]);
+      numParts.push(numType[100][tenshunsCase]);
     }
   
     if (tens === 1 && ones === 0) {
@@ -394,10 +490,10 @@ function getHundreds(number) {
     } else {
       if (tens === 1 && ones > 0) {
         numParts.push(numType[ones][caseChoice] + "toista");
-        displayWordAnswer = numParts.join("&shy;");
-        return numParts.join("");
+        return numParts;
       } else if (tens > 1) {
-      numParts.push(numType[tens][caseChoice] + numType[10][tenshunsCase]);
+        numParts.push(numType[tens][caseChoice]);
+        numParts.push(numType[10][tenshunsCase]);
       }
 
       if (ones > 0) {
@@ -413,8 +509,7 @@ function getHundreds(number) {
       } 
     }
   }
-  displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("");
+  return numParts;
   
 }
 
@@ -431,15 +526,16 @@ function getThousands(number) {
   if (thousands === 1) {
     numParts.push(numType[1000][caseChoice]);
   } else {
-    numParts.push(getHundreds(thousands) + numType[1000][thousCase]);
+    numParts.push(...getHundreds(thousands));
+    numParts.push(numType[1000][thousCase]);
   }
 
   if (hundreds > 0) {
-    numParts.push(getHundreds(hundreds));
+    numParts.push(...getHundreds(hundreds));
   }
 
-  displayWordAnswer = numParts.join("&shy;");
-  return numParts.join("");
+  
+  return numParts;
 }
 
 // Checks user answer against correct answer so either number in digit or word form
@@ -454,7 +550,7 @@ function checkAnswer() {
   }
 
   if (numView) {
-    if (!/^[a-zA-ZåäöÅÄÖ\s-]+$/.test(answer)) {
+    if (!/^[a-zåäö\- ]+$/i.test(answer)) {
       document.getElementById("countBox").textContent = "Please enter only text!";
       document.getElementById("input").focus();
       return;
@@ -467,44 +563,101 @@ function checkAnswer() {
 
     shownAns = wordAnswer;
   } else {
-    if (isNaN(answer)) {
+    if (!shortCheckBox.checked && isNaN(answer)) {
       document.getElementById("countBox").textContent = "Please enter only digits!";
       document.getElementById("input").focus();
       return;
+    } else if (!shortCheckBox.checked) {
+      correctAns = (parseInt(answer) === ranNum);
+      shownAns = ranNum;
+    } else { 
+      correctAns = (answer === shortDisplayNum);
+      shownAns = shortDisplayNum;
     }
-    correctAns = (parseInt(answer) === ranNum);
-    shownAns = ranNum;
   }
 
-  if (correctAns) {
+  if (correctAns && !shortCheckBox.checked) {
     count++;
     if (ekatokaAnswer === "") {
     document.getElementById("countBox").innerHTML = "Correct! '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
-    wordAnswer + "</span>' <br>Current Streak: " + count; 
+    displayWordAnswer + "</span>' <br>Current Streak: " + count; 
     } else {
       document.getElementById("countBox").innerHTML = "Correct! '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
-      wordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: " + count; 
+      displayWordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: " + count; 
     }
     document.getElementById("input").value = "";
-    return;
-  } else {
+    // return; 
+    // removed due to not generating a new answer but left commented in as this will all be tidied up
+  } else if (!shortCheckBox.checked) {
     if (ekatokaAnswer === "") {
+      count = 0;
       document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
-      wordAnswer + "</span>' <br>Current Streak: 0"; 
+      displayWordAnswer + "</span>' <br>Current Streak: 0"; 
     } else {
+      count = 0;
       document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + ranNum + "</span>' is '<span class='red-word'>" + 
-      wordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: 0";  
+      displayWordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: 0";  
     }
+  } else if (correctAns && shortCheckBox.checked) {
+    count++;
+    if (ekatokaAnswer === "") {
+      document.getElementById("countBox").innerHTML = "Correct! '<span class='red-word'>" + shortDisplayNum + "</span>' is '<span class='red-word'>" + 
+      displayWordAnswer + "</span>' <br>Current Streak: " + count; 
+    } else {
+      document.getElementById("countBox").innerHTML = "Correct! '<span class='red-word'>" + shortDisplayNum + "</span>' is '<span class='red-word'>" + 
+      displayWordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: " + count; 
+    }
+    document.getElementById("input").value = "";
+    // return;
+    // removed due to not generating a new answer but left commented in as this will all be tidied up
+  } else {
+    if (caseChoice !== "nominative") {
+      if (ekatokaAnswer === "") {
+        count = 0;
+        document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + shortDisplayNum + "</span>' is '<span class='red-word'>" + 
+        displayWordAnswer + "</span>' <br>Current Streak: 0"; 
+      } else {
+        count = 0;
+        document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + 
+        shortDisplayNum + "</span>' or '<span class='red-word'>" + ekatokaNum + "</span>' is '<span class='red-word'>" + 
+        displayWordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: 0";  
+      }
+    } else {
+      if (ordinalView && shortCheckBox.checked) {
+        if (ekatokaAnswer === "") {
+          count = 0;
+          document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + 
+          shortDisplayNum + "</span>' or '<span class='red-word'>" + altNum + "</span>' is '<span class='red-word'>" + 
+          displayWordAnswer + "</span>' <br>Current Streak: 0"; 
+        } else {
+          count = 0;
+          document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + 
+          shortDisplayNum + "</span>' or '<span class='red-word'>" + altNum + "</span>' is '<span class='red-word'>" + 
+          displayWordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: 0";  
+        }
+      } else if (ordinalView && !shortCheckBox.checked) {
+        if (ekatokaAnswer === "") {
+          count = 0;
+          document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + shortDisplayNum + "</span>' is '<span class='red-word'>" + 
+          displayWordAnswer + "</span>' <br>Current Streak: 0"; 
+        } else {
+          count = 0;
+          document.getElementById("countBox").innerHTML = "Incorrect! You wrote '<span class='red-word'>" + answer + "</span>' but '<span class='red-word'>" + shortDisplayNum + "</span>' is '<span class='red-word'>" + 
+          displayWordAnswer + "</span>' or '<span class='red-word'>" + ekatokaAnswer + "</span>' <br>Current Streak: 0";  
+        }
+      }
+    }  
   }
-
-  if (count > streak) {
+  
+    if (count > streak) {
     streak = count;
   }
   document.getElementById("streakBox").textContent = "Highest Streak: " + streak;
   document.getElementById("input").value = "";
   document.getElementById("input").style.height = "auto";
   document.getElementById("input").rows = 1;
-  count = 0;
+  genRanNum();
+  // count = 0;
 }
 
 // Switches between number and text display
@@ -514,11 +667,13 @@ function switchRan() {
 
   numView = !numView;
 
-  // document.getElementById("numBox").innerHTML = numView ? ranNum : displayWordAnswer;
-  document.getElementById("numBox").innerHTML = numView ? ranNum : wordAnswer;
-  content = document.getElementById("numBox").textContent;
-
-  
+  if (!shortCheckBox.checked) {
+    document.getElementById("numBox").innerHTML = numView ? ranNum : displayWordAnswer;
+    content = document.getElementById("numBox").innerHTML;
+  } else {
+    document.getElementById("numBox").innerHTML = numView ? shortDisplayNum : displayWordAnswer;
+    content = document.getElementById("numBox").innerHTML;
+  }
 
   document.getElementById("switchButton").textContent = numView ? "Switch to Text" : "Switch to Number";
 }
@@ -538,5 +693,15 @@ function getNumType() {
     return ordinalView ? pluralOrdinalCases : pluralCases;
   } else {
     return ordinalView ? ordinalCases : cases;
+  }
+}
+
+// for switching that the number and relevant answer needs the correct shortening ending :
+
+function shortCaseType() {
+  if (pluralView) {
+    return ordinalView ? shortenPluralOrdinals : shortenPluralCases; 
+  } else {
+    return ordinalView ? shortenOrdinals : shortenCases;
   }
 }
