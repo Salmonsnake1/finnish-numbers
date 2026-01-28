@@ -358,7 +358,7 @@ function genRanNum() {
     }
     
     if (numView) {
-      document.getElementById("numBox").innerHTML = shortDisplayNum; 
+      document.getElementById("numBox").textContent = shortDisplayNum; 
     } else {
       document.getElementById("numBox").innerHTML = displayWordAnswer; 
       // document.getElementById("numBox").innerHTML = wordAnswer;
