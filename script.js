@@ -358,9 +358,9 @@ function genRanNum() {
     }
     
     if (numView) {
-      document.getElementById("numBox").innerHTML = shortDisplayNum; 
+      document.getElementById("numBox").textContent = shortDisplayNum; 
     } else {
-      document.getElementById("numBox").innerHTML = displayWordAnswer; 
+      document.getElementById("numBox").textContent = displayWordAnswer; 
       // document.getElementById("numBox").innerHTML = wordAnswer;
       
     }
@@ -668,11 +668,11 @@ function switchRan() {
   numView = !numView;
 
   if (!shortCheckBox.checked) {
-    document.getElementById("numBox").innerHTML = numView ? ranNum : displayWordAnswer;
-    content = document.getElementById("numBox").innerHTML;
+    document.getElementById("numBox").textContent = numView ? ranNum : displayWordAnswer;
+    content = document.getElementById("numBox").textContent;
   } else {
     document.getElementById("numBox").innerHTML = numView ? shortDisplayNum : displayWordAnswer;
-    content = document.getElementById("numBox").innerHTML;
+    content = document.getElementById("numBox").textContent;
   }
 
   document.getElementById("switchButton").textContent = numView ? "Switch to Text" : "Switch to Number";
