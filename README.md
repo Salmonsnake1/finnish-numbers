@@ -1,6 +1,8 @@
 # Finnish Number Practice
 
-![Finnish Numbers Demo](assets/demonumbers.gif)
+<p align="center">
+  <img src="assets/demo.gif" alt="Finnish Numbers Demo" />
+</p>
 
 A personal web-based tool for practicing Finnish numbers and their inflections (0 - 1000000). Users can generate a random number and try to write the number down correctly in Finnish, in singular or plural, across all cases. Ordinal numbers are also supported and either yhdes or ensimmäinen, kahdes or toinen are accepted. Can toggle between writing down the number in digit or text form. 
 
