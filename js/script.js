@@ -288,24 +288,24 @@ async function startProg() {
 // Loading json file to cases
 async function loadCases() {
   try {
-    const response = await fetch('./cases.json');
+    const response = await fetch('data/cases.json');
     cases = await response.json();
-    const responseOrdinal = await fetch('./ordinals.json');
+    const responseOrdinal = await fetch('data/ordinals.json');
     ordinalCases = await responseOrdinal.json();
-    const pluralResponse = await fetch('./pluralcases.json');
+    const pluralResponse = await fetch('data/pluralcases.json');
     pluralCases = await pluralResponse.json();
-    const pluralOrdinalResponse = await fetch('./pluralordinals.json');
+    const pluralOrdinalResponse = await fetch('data/pluralordinals.json');
     pluralOrdinalCases = await pluralOrdinalResponse.json();
-    const shortenCasesResponse = await fetch('./shortencases.json');
+    const shortenCasesResponse = await fetch('data/shortencases.json');
     shortenCases = await shortenCasesResponse.json();
     console.log(shortenCases);
-    const shortenOrdinalsResponse = await fetch('./shortenordinals.json');
+    const shortenOrdinalsResponse = await fetch('data/shortenordinals.json');
     shortenOrdinals = await shortenOrdinalsResponse.json();
     console.log(shortenOrdinals);
-    const shortenPluralCasesResponse = await fetch ('./shortenpluralcases.json');
+    const shortenPluralCasesResponse = await fetch ('data/shortenpluralcases.json');
     shortenPluralCases = await shortenPluralCasesResponse.json();
     console.log(shortenPluralCases);
-    const shortenPluralOrdinalsResponse = await fetch ('./shortenpluralordinals.json');
+    const shortenPluralOrdinalsResponse = await fetch ('data/shortenpluralordinals.json');
     shortenPluralOrdinals = await shortenPluralOrdinalsResponse.json();
     console.log(shortenPluralOrdinals);
   } catch (error) {
