@@ -25,7 +25,6 @@ For local use:
 2. Open the folder and open index.html in the web browser.
 3. Start practicing
 
-
 ## Features
 
 - Random number generation with full range 0 - 1000000
