@@ -47,6 +47,7 @@ For local use:
 - Better support for custom range input
 - Better display for numbers with : endings
 - Accounts for plural genitive -ten
+- Storage of streak between sessions.
 
 ## Potential upcoming features
 
